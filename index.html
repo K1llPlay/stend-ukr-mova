@@ -1,0 +1,741 @@
+<title>Цифровий світ, українське слово</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Nunito:wght@400;800&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: digital wall newspaper — stitched intro, pixel-embroidery band (stitches = pixels), hero with Ukrainian-only letters, word ticker, exhibit grid; every work opens in an on-page viewer that flies out of its card */
+:root{
+  --bg:#f6f5f1; --paper:#ffffff; --ink:#17161c; --muted:#5d5a66; --line:#dedbe3;
+  --red:#c4161c; --red-soft:#fbe9e8; --blue:#1f4fd1; --blue-soft:#e8eeff;
+  --stitch-a:#c4161c; --stitch-b:#17161c; --shadow:rgba(23,22,28,.28);
+  --ua-blue:#0057b7; --ua-yellow:#ffd500;
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Golos Text","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:16px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121116; --paper:#1b1a21; --ink:#f1eff5; --muted:#a6a2b1; --line:#2e2c37;
+  --red:#ff5a55; --red-soft:#3a1b1d; --blue:#8aa8ff; --blue-soft:#1d2440;
+  --stitch-a:#ff5a55; --stitch-b:#f1eff5; --shadow:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121116; --paper:#1b1a21; --ink:#f1eff5; --muted:#a6a2b1; --line:#2e2c37;
+  --red:#ff5a55; --red-soft:#3a1b1d; --blue:#8aa8ff; --blue-soft:#1d2440;
+  --stitch-a:#ff5a55; --stitch-b:#f1eff5; --shadow:rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1140px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+canvas.band{display:block;width:100%;height:56px}
+#progress{position:fixed;left:0;top:env(safe-area-inset-top,0px);height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--ua-blue),var(--ua-yellow) 50%,var(--red));z-index:50}
+
+/* intro splash */
+#splash{position:fixed;inset:0;z-index:100;background:#121116;color:#f1eff5;display:grid;place-items:center;cursor:pointer;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#splash .in{display:grid;justify-items:center;gap:22px;text-align:center}
+#splash canvas{width:180px;height:180px}
+#splash .s1{font:500 12px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:#ff5a55;opacity:0;animation:sfade .6s .5s ease forwards}
+#splash .s2{font:800 clamp(22px,4vw,40px)/1.1 var(--f-display);max-width:18ch}
+#splash .s2 span{display:inline-block;opacity:0;transform:translateY(.5em) rotate(6deg);animation:charIn .5s cubic-bezier(.2,1.4,.4,1) forwards;animation-delay:calc(var(--i)*28ms + 700ms)}
+#splash .skip{font:500 12px var(--f-body);color:#a6a2b1;opacity:0;animation:sfade .6s 1.6s ease forwards}
+#splash.out{animation:wipe .9s cubic-bezier(.75,0,.2,1) forwards}
+
+/* hero */
+header{position:relative;padding-block:40px 30px}
+#sky{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
+header > *:not(#sky){position:relative;z-index:1}
+.school{font-family:var(--f-mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.school b{color:var(--red);font-weight:500}
+.school .dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.6s ease-in-out infinite}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(32px,6vw,70px);line-height:1.05;letter-spacing:-.025em;margin:18px 0 0;max-width:15ch;perspective:600px}
+h1 .word{display:inline-block;white-space:nowrap}
+h1 .ch{display:inline-block;transform-origin:50% 100%}
+h1 .red{color:var(--red)}
+h1 .slovo{position:relative}
+h1 .slovo svg{position:absolute;left:0;right:0;bottom:-.16em;width:100%;height:.22em;overflow:visible}
+h1 .slovo path{fill:none;stroke:var(--ua-yellow);stroke-width:5;stroke-linecap:round;stroke-dasharray:6 7}
+html.go h1 .ch{animation:flipIn .9s cubic-bezier(.2,1.3,.4,1) backwards;animation-delay:calc(var(--i)*35ms + 150ms)}
+html.go h1 .slovo path{animation:draw 1.2s 1.2s ease backwards}
+.sub{font-family:var(--f-display);font-weight:500;font-size:clamp(16px,2.2vw,22px);color:var(--muted);margin:16px 0 0}
+.sub .typed::after{content:"";display:inline-block;width:.08em;height:1em;margin-left:3px;vertical-align:-.12em;background:var(--red);animation:blink 1s steps(1) infinite}
+.intro{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px;margin-top:30px;align-items:start}
+html.go .intro{animation:rise .8s 1s cubic-bezier(.2,.9,.2,1) backwards}
+.intro p{margin:0;font-size:18px;max-width:60ch}
+.meta{border:1px solid var(--line);background:var(--paper);border-radius:var(--r);padding:18px;display:grid;gap:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{border-radius:12px;background:var(--bg);padding:10px 12px}
+.stat b{display:block;font:800 26px/1.1 var(--f-display);color:var(--red);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.meta .acc{font-size:14px;color:var(--muted)} .meta .acc strong{color:var(--ink);font-weight:600}
+.share{display:flex;flex-wrap:wrap;gap:8px}
+.btn{position:relative;overflow:hidden;font:600 14px/1 var(--f-body);display:inline-flex;align-items:center;gap:8px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;text-decoration:none;transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .2s ease}
+.btn:hover{border-color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 18px -10px var(--shadow)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn .arr{display:inline-block;transition:transform .2s ease}
+.btn:hover .arr{transform:translateX(4px)}
+.btn.tg{background:#2aabee;border-color:#2aabee;color:#fff}
+.btn .rip{position:absolute;border-radius:50%;background:currentColor;opacity:.25;transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+.btn:focus-visible,[data-go]:focus-visible,.cover:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.btn svg{width:18px;height:18px;flex:none}
+.toast{font-size:13px;color:var(--muted);min-height:1.2em;overflow-wrap:anywhere}
+
+/* ticker */
+.ticker{border-block:2px solid var(--ink);overflow:hidden;margin-top:8px;background:var(--paper)}
+.ticker .row{display:flex;width:max-content;gap:0;padding-block:10px;font:700 clamp(15px,2vw,20px)/1 var(--f-display);white-space:nowrap;animation:marq 38s linear infinite}
+.ticker .row + .row{border-top:1px dashed var(--line);animation-direction:reverse;animation-duration:46s;color:var(--muted);font-weight:500}
+.ticker .row span{padding-inline:18px}
+.ticker .row i{font-style:normal;color:var(--red)}
+.ticker:hover .row{animation-play-state:paused}
+
+/* works */
+section.works{padding-block:34px 50px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.sec-h h2{font-family:var(--f-display);font-weight:700;font-size:clamp(20px,3vw,30px);margin:0}
+.sec-h span{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px;perspective:1200px}
+.card{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transition:transform .35s cubic-bezier(.2,.9,.2,1),box-shadow .3s ease,border-color .3s ease;will-change:transform}
+.card:hover{--ty:-6px;box-shadow:0 26px 44px -26px var(--shadow);border-color:var(--red)}
+.card::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:radial-gradient(500px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.16),transparent 45%);opacity:0;transition:opacity .3s ease}
+.card:hover::after{opacity:1}
+html.go .card{animation:cardIn .9s cubic-bezier(.2,1.1,.3,1) backwards;animation-delay:calc(var(--i)*140ms + 1.15s)}
+.card.reveal{animation:lift .9s cubic-bezier(.2,1.1,.3,1)}
+.cover{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--red-soft);overflow:hidden;cursor:pointer}
+.cover > canvas,.cover > video,.cover > .stage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.2,.9,.2,1)}
+.card:hover .cover > canvas,.card:hover .cover > video,.card:hover .cover > .stage{transform:scale(1.06)}
+.cover .stage{pointer-events:none}
+.cover::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.35) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.card:hover .cover::before{animation:shine 1s ease}
+.cover .ico{position:absolute;left:14px;bottom:14px;width:52px;height:52px;border-radius:12px;background:var(--paper);display:grid;place-items:center;box-shadow:0 6px 16px -8px rgba(0,0,0,.45);z-index:2;transition:transform .35s cubic-bezier(.2,1.5,.4,1)}
+.card:hover .cover .ico{transform:rotate(-8deg) scale(1.12)}
+.cover .ico svg{width:28px;height:28px}
+.num{position:absolute;right:12px;top:12px;font-family:var(--f-mono);font-size:12px;background:var(--paper);color:var(--ink);padding:4px 8px;border-radius:6px;z-index:2}
+.cover .hint{position:absolute;inset:auto 14px 14px auto;z-index:2;font:600 13px var(--f-body);background:var(--ink);color:var(--bg);padding:8px 12px;border-radius:999px;opacity:0;transform:translateY(8px) scale(.9);transition:.3s cubic-bezier(.2,1.4,.4,1)}
+.card:hover .cover .hint{opacity:1;transform:none}
+.cover .playbig{position:absolute;left:50%;top:50%;z-index:2;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(196,22,28,.92);color:#fff;display:grid;place-items:center;font-size:22px;box-shadow:0 0 0 0 rgba(196,22,28,.5);animation:pulse 2s ease-out infinite}
+.body{padding:20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-size:12px;padding:4px 8px;border-radius:6px;background:var(--blue-soft);color:var(--blue)}
+.chip.t{background:var(--red-soft);color:var(--red)}
+.card h3{font-family:var(--f-display);font-weight:700;font-size:20px;line-height:1.22;margin:0;text-wrap:balance}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.author{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:14px;border-top:1px dashed var(--line)}
+.ava{width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 14px var(--f-display);flex:none;transition:transform .4s cubic-bezier(.2,1.5,.4,1)}
+.card:hover .ava{transform:rotate(360deg)}
+.author .n{font-weight:600;line-height:1.25}
+.author .c{font-size:13px;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ext-note{font-size:13px;color:var(--muted)}
+footer{padding-bottom:10px}
+footer .f{border-top:1px solid var(--line);padding-block:22px 18px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* viewer */
+dialog{border:none;padding:0;border-radius:18px;width:min(1180px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);background:var(--paper);color:var(--ink);overflow:hidden;display:flex;flex-direction:column}
+dialog:not([open]){display:none}
+dialog::backdrop{background:rgba(10,10,14,.8);backdrop-filter:blur(6px);animation:sfade .4s ease}
+dialog.closing::backdrop{animation:sfade .35s ease reverse forwards}
+dialog.max{width:100vw;height:100dvh;max-height:100dvh;border-radius:0;margin:0}
+.dlg-h{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px 10px 18px;border-bottom:1px solid var(--line);flex:none}
+.dlg-h .t{min-width:0}
+.dlg-h b{font-family:var(--f-display);font-size:15px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlg-h small{color:var(--muted);font-size:13px}
+.dlg-b{position:relative;background:#0d0c12;overflow:auto;flex:1;min-height:0}
+.dlg-b > video{display:block;width:100%;height:100%;max-height:calc(100dvh - 90px);background:#000}
+dialog.max .dlg-b > video{max-height:none}
+.pdfpages{display:grid;gap:16px;padding:16px;justify-items:center}
+.pdfpages canvas{width:100%;max-width:1000px;height:auto;border-radius:6px;box-shadow:0 10px 30px -12px #000;background:#fff;animation:pageIn .7s cubic-bezier(.2,1,.3,1) backwards}
+dialog.max .pdfpages canvas{max-width:min(1400px, calc((100dvh - 100px) * 16 / 9))}
+.loading{color:#d9d6e2;font:500 15px var(--f-body);padding:60px 20px;text-align:center;display:grid;justify-items:center;gap:16px}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid #2b2934;border-top-color:var(--ua-yellow);border-right-color:var(--ua-blue);animation:spin .9s linear infinite}
+#confetti{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+
+/* slide player */
+.player{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px;min-height:100%}
+.player .stage{width:min(100%, calc((100dvh - 195px) * 16 / 9));border-radius:10px;box-shadow:0 10px 40px -12px #000}
+dialog.max .player{justify-content:center}
+dialog.max .player .stage{width:min(100%, calc((100dvh - 170px) * 16 / 9))}
+.ctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;color:#d9d6e2;font:500 14px var(--f-mono)}
+.ctrl .btn{background:#26242e;border-color:#3a3744;color:#f1eff5}
+.ctrl .btn:hover{border-color:#f1eff5}
+.sbar{width:min(100%,520px);height:4px;border-radius:4px;background:#2b2934;overflow:hidden}
+.sbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ua-blue),var(--ua-yellow));transition:width .45s cubic-bezier(.2,.9,.2,1)}
+
+/* rendered PowerPoint slide */
+.stage{position:relative;aspect-ratio:16/9;max-width:100%;container-type:size;overflow:hidden;background:#101330;color:#000;font-family:Nunito,sans-serif;line-height:1.2}
+.stage .sl{position:absolute;inset:0}
+.stage .sl.in-next{animation:slIn .55s cubic-bezier(.2,.9,.2,1) backwards}
+.stage .sl.in-prev{animation:slInPrev .55s cubic-bezier(.2,.9,.2,1) backwards}
+.stage .sl.out{animation:slOut .45s ease forwards;pointer-events:none}
+.stage .sl.out-prev{animation:slOutPrev .45s ease forwards;pointer-events:none}
+.stage .el,.stage .grp{position:absolute}
+.stage .grp{inset:0;pointer-events:none}
+.stage .grp > *{pointer-events:auto}
+.stage .el img{display:block;width:100%;height:100%;object-fit:fill;user-select:none}
+.stage .tx{position:absolute;inset:0;display:flex;flex-direction:column;overflow:visible}
+.stage .tx p{margin:0;white-space:pre-wrap}
+.stage [data-go]{cursor:pointer;transition:filter .15s ease, scale .2s cubic-bezier(.2,1.5,.4,1)}
+.stage [data-go]:hover{filter:brightness(1.12);scale:1.03}
+.stage [data-go]:active{scale:.96}
+.stage .vid{position:absolute;inset:0;cursor:pointer}
+.stage .vid img{width:100%;height:100%;object-fit:cover}
+.stage .vid video{width:100%;height:100%;background:#000}
+.stage .vid .play{position:absolute;left:50%;top:50%;translate:-50% -50%;width:16cqh;height:16cqh;border-radius:50%;background:rgba(255,90,31,.95);color:#fff;display:grid;place-items:center;font-size:6cqh;box-shadow:0 0 0 2cqh rgba(255,90,31,.25);animation:ping 1.8s ease-out infinite}
+.stage .an-pop{animation:spop .55s cubic-bezier(.3,1.5,.6,1) backwards;animation-delay:var(--d,0ms)}
+.stage .an-fly{animation:sfly .6s cubic-bezier(.2,.9,.2,1) backwards;animation-delay:var(--d,0ms)}
+.stage .an-fade{animation:sfade .6s ease backwards;animation-delay:var(--d,0ms)}
+.stage .an-loop{animation:bob 2.6s ease-in-out infinite alternate}
+.cover .stage *{animation:none!important}
+
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+@keyframes charIn{to{opacity:1;transform:none}}
+@keyframes flipIn{from{opacity:0;transform:translateY(.4em) rotateX(-95deg) scale(.8)}}
+@keyframes draw{from{stroke-dashoffset:400;opacity:0}}
+@keyframes cardIn{from{opacity:0;transform:translateY(60px) rotateX(18deg) scale(.94)}}
+@keyframes lift{from{transform:translateY(40px) rotateX(10deg)}}
+@keyframes float{from{transform:translateY(-8px) rotate(-4deg)}to{transform:translateY(10px) rotate(4deg)}}
+@keyframes blink{50%{opacity:.2}}
+@keyframes wipe{to{clip-path:inset(0 0 100% 0)}}
+@keyframes marq{to{transform:translateX(-50%)}}
+@keyframes shine{to{transform:translateX(120%)}}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+@keyframes pulse{70%{box-shadow:0 0 0 18px rgba(196,22,28,0)}100%{box-shadow:0 0 0 0 rgba(196,22,28,0)}}
+@keyframes pageIn{from{opacity:0;transform:translateY(40px) scale(.97)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slIn{from{opacity:0;transform:translateX(8%) scale(.96)}}
+@keyframes slInPrev{from{opacity:0;transform:translateX(-8%) scale(.96)}}
+@keyframes slOut{to{opacity:0;transform:translateX(-6%) scale(.96)}}
+@keyframes slOutPrev{to{opacity:0;transform:translateX(6%) scale(.96)}}
+@keyframes spop{from{opacity:0;scale:.5}}
+@keyframes sfly{from{opacity:0;translate:0 10cqh}}
+@keyframes sfade{from{opacity:0}}
+@keyframes bob{from{translate:0 -.8cqh}to{translate:0 .8cqh}}
+@keyframes ping{70%,100%{box-shadow:0 0 0 5cqh rgba(255,90,31,0)}}
+
+@media (max-width:820px){.intro{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.intro p{font-size:16px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+
+<div id="progress"></div>
+<canvas class="band" id="band" aria-hidden="true"></canvas>
+
+<div class="wrap">
+<header id="hero">
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="school"><span class="dot"></span><b>Білогородський Академічний Ліцей №2</b><span>Віртуальний стенд · 2026</span></div>
+  <h1 id="h1" aria-label="Цифровий світ, українське слово">Цифровий світ, <span class="red">українське</span> <span class="red slovo">слово<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M2 12 Q 50 2 100 11 T 198 9"/></svg></span></h1>
+  <p class="sub"><span class="typed" id="typed">презентуємо мову по-новому</span></p>
+  <div class="intro">
+    <p>Учні підготували презентації, відео та інтерактивні матеріали, де українська мова звучить по-новому: через сучасні формати, цифрові інструменти й штучний інтелект. Під кожною роботою вказано автора та клас. Натисніть на картку, і робота відкриється просто тут, на стенді.</p>
+    <aside class="meta" aria-label="Про стенд">
+      <div class="stats">
+        <div class="stat"><b data-count="4">4</b><span>роботи</span></div>
+        <div class="stat"><b data-count="4">4</b><span>автори</span></div>
+        <div class="stat"><b data-count="2">2</b><span>класи</span></div>
+      </div>
+      <div class="acc">Доступ: <strong>за посиланням, без реєстрації</strong></div>
+      <div class="share">
+        <a class="btn tg" id="tg" href="https://t.me/share/url" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 18.7 19.4c-.2 1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.3-5 9.1-8.2c.4-.4-.1-.6-.6-.2L6.2 13 1.4 11.5c-1-.3-1-1 .2-1.5L20.6 2.7c.9-.3 1.6.2 1.3 1.6z"/></svg>
+          Поділитися в Telegram</a>
+        <button class="btn" id="copy" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+          Скопіювати посилання</button>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </aside>
+  </div>
+</header>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <div class="row" id="row1"></div>
+  <div class="row" id="row2"></div>
+</div>
+
+<div class="wrap">
+<section class="works" aria-labelledby="wh">
+  <div class="sec-h"><h2 id="wh">Виставка учнівських робіт</h2><span>презентації · відео · Canva</span></div>
+  <div class="grid" id="grid"></div>
+</section>
+</div>
+
+<footer>
+  <canvas class="band" id="band2" aria-hidden="true"></canvas>
+  <div class="wrap"><div class="f">
+    <span>Білогородський Академічний Ліцей №2 · українська мова</span>
+    <span>Цифровий світ, українське слово</span>
+  </div></div>
+</footer>
+
+<dialog id="dlg" aria-labelledby="dlgt">
+  <div class="dlg-h">
+    <div class="t"><b id="dlgt"></b><small id="dlga"></small></div>
+    <div class="actions">
+      <button class="btn" id="dlgfs" type="button">⛶ На весь екран</button>
+      <button class="btn primary" id="dlgclose" type="button">Закрити ✕</button>
+    </div>
+  </div>
+  <div class="dlg-b" id="dlgb"></div>
+</dialog>
+
+<script src="works/grammar/slides.js"></script>
+<script>
+// On GitHub Pages the stand shares its own address; inside Claude it shares the artifact link
+const STAND_URL = /github\.io$/.test(location.hostname) ? location.origin + location.pathname : "https://claude.ai/artifact/RtxX4MaGuszsoSkSgwagHQ";
+const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const root = document.documentElement;
+
+const ICONS = {
+  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h5"/></svg>',
+  slides:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8M7 12l3-3 2 2 4-4"/></svg>',
+  video:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-2v8l-4-2z"/></svg>',
+  design:'<svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-1.8 0-1.3-1.3-1.6-1.3-2.7 0-1 .8-1.5 1.8-1.5H17a4 4 0 0 0 4-4C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg>'
+};
+
+const WORKS = [
+  {
+    title:"Апгрейд солов'їної: говори українською без вірусів та кальок",
+    desc:"Десять «мовних вірусів»: поширені кальки й суржикові фрази, які трапляються навіть у відмінників, і як сказати правильно.",
+    name:"Роман Отрішко", cls:"8-В клас",
+    type:"pdf", chips:["Презентація PDF","10 слайдів"],
+    open:{kind:"pdf", src:"works/otrishko-roman-8v.pdf"}, label:"Переглянути презентацію"
+  },
+  {
+    title:"Граматична основа: робимо реченню рентген",
+    desc:"Як знайти підмет і присудок: відеопояснення, ментальна карта та інтерактивний тест на 8 запитань. Тест працює просто на стенді.",
+    name:"Богдан Тищенко", cls:"8-В клас",
+    type:"slides", chips:["Інтерактивна презентація","33 слайди","відео 3:36","тест"],
+    open:{kind:"slides"}, label:"Відкрити презентацію"
+  },
+  {
+    title:"Граматична основа: підмет і присудок",
+    desc:"Коротке відеопояснення: як знайти в реченні підмет і присудок.",
+    name:"Ілля Клембовський", cls:"8-В клас",
+    type:"video", chips:["Відео","1:12"],
+    open:{kind:"video", src:"works/ukr-video.mp4"}, label:"Дивитися відео"
+  },
+  {
+    title:"Як морфологія займенника рятує наші меми та треки",
+    desc:"Займенник на прикладах мемів і пісень: граматика мовою, якою говорять у соцмережах.",
+    name:"Вероніка Ємельянова", cls:"7-А клас",
+    type:"design", chips:["Презентація Canva"],
+    href:"https://www.canva.com/design/DAHYEDsPdtk/pScp38WRnPDx1kGhZwPsmw/view", label:"Відкрити в Canva"
+  }
+];
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const initials = n => n.split(/\s+/).map(w=>w[0]).slice(0,2).join("");
+
+/* ---------- intro splash ---------- */
+function splash(){
+  if (reduce || document.hidden) return Promise.resolve();
+  const title = "Цифровий світ, українське слово";
+  const el = document.createElement("div"); el.id = "splash";
+  el.innerHTML = `<div class="in"><canvas width="360" height="360"></canvas>
+    <div class="s1">Білогородський Академічний Ліцей №2</div>
+    <div class="s2">${(()=>{ let i = 0; return title.split(" ").map(w=>`<b style="white-space:nowrap;font:inherit">${[...w].map(c=>`<span style="--i:${i++}">${esc(c)}</span>`).join("")}</b>`).join(" "); })()}</div>
+    <div class="skip">натисніть, щоб пропустити</div></div>`;
+  document.body.appendChild(el);
+  // stitch a big rhombus cross by cross
+  const cv = el.querySelector("canvas"), g = cv.getContext("2d"), cell = 40;
+  const cells = []; MOTIF.forEach((row,r)=>[...row].forEach((ch,c)=>{ if (ch!==".") cells.push([c,r,ch]); }));
+  cells.sort((a,b)=>(Math.abs(a[0]-4)+Math.abs(a[1]-4))-(Math.abs(b[0]-4)+Math.abs(b[1]-4)));
+  let k = 0; const t0 = performance.now();
+  (function step(t){ const want = Math.min(cells.length, Math.floor((t-t0)/16)); while (k<want){ const [c,r,ch]=cells[k++];
+      g.strokeStyle = ch==="A" ? "#ff5a55" : "#f1eff5"; g.lineWidth = 7; g.lineCap = "round";
+      const x=c*cell, y=r*cell, p=9; g.beginPath(); g.moveTo(x+p,y+p); g.lineTo(x+cell-p,y+cell-p); g.moveTo(x+cell-p,y+p); g.lineTo(x+p,y+cell-p); g.stroke(); }
+    if (k<cells.length) requestAnimationFrame(step); })(t0);
+  return new Promise(res=>{
+    let done = false;
+    const finish = ()=>{ if (done) return; done = true; el.classList.add("out"); res(); setTimeout(()=>el.remove(), 950); };
+    el.addEventListener("click", finish);
+    setTimeout(finish, 2300);
+  });
+}
+
+/* ---------- pixel embroidery: cross-stitches as pixels ---------- */
+const MOTIF = ["....A....","...ABA...","..AB.BA..",".AB.A.BA.","AB.ABA.BA",".AB.A.BA.","..AB.BA..","...ABA...","....A...."];
+function tokens(){ const cs = getComputedStyle(root); return [cs.getPropertyValue("--stitch-a").trim(), cs.getPropertyValue("--stitch-b").trim()]; }
+function stitch(cv, seed, cell, animate){
+  const dpr = Math.min(devicePixelRatio||1, 2);
+  const w = cv.clientWidth, h = cv.clientHeight; if(!w||!h) return;
+  cv.width = w*dpr; cv.height = h*dpr;
+  const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  const [A,B] = tokens();
+  const rows = Math.floor(h/cell), cols = Math.ceil(w/cell), oy = Math.floor((rows-9)/2);
+  const xs = [];
+  for(let c=0;c<cols;c++) for(let r=0;r<rows;r++){
+    const mr = r-oy, mc = (c+seed) % 11; let ch = ".";
+    if (mr>=0&&mr<9&&mc<9) ch = MOTIF[mr][mc];
+    else if (r===oy-2||r===oy+10) ch = (c%2===0)?"B":".";
+    if (ch!==".") xs.push([c,r,ch]);
+  }
+  const draw = ([c,r,ch])=>{
+    g.strokeStyle = ch==="A"?A:B; g.lineWidth = Math.max(1.4, cell*0.22); g.lineCap="round";
+    const x=c*cell, y=r*cell, p=cell*0.22;
+    g.beginPath(); g.moveTo(x+p,y+p); g.lineTo(x+cell-p,y+cell-p); g.moveTo(x+cell-p,y+p); g.lineTo(x+p,y+cell-p); g.stroke();
+  };
+  if (!animate || reduce || document.hidden) { xs.forEach(draw); return; }
+  let k = 0; const per = Math.ceil(xs.length / 70);
+  (function step(){ for (let n=0;n<per && k<xs.length;n++) draw(xs[k++]); if (k<xs.length) requestAnimationFrame(step); })();
+  setTimeout(()=>{ while (k<xs.length) draw(xs[k++]); }, 2500);
+}
+function drawBands(animate){
+  stitch(document.getElementById("band"), 0, 4.4, animate);
+  stitch(document.getElementById("band2"), 5, 4.4, false);
+  document.querySelectorAll(".cover > canvas[data-seed]").forEach(cv=>stitch(cv, +cv.dataset.seed, 12, false));
+}
+
+/* ---------- hero: flipping letters, typing, drifting stitches ---------- */
+(function splitTitle(){
+  const h = document.getElementById("h1"); let i = 0;
+  const walk = node => [...node.childNodes].forEach(n=>{
+    if (n.nodeType===3){
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(part=>{
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+        const w = document.createElement("span"); w.className = "word"; w.setAttribute("aria-hidden","true");
+        [...part].forEach(c=>{ const s = document.createElement("span"); s.className="ch"; s.style.setProperty("--i", i++); s.textContent = c; w.appendChild(s); });
+        frag.appendChild(w);
+      });
+      n.replaceWith(frag);
+    } else if (n.nodeType===1 && n.tagName!=="svg") walk(n);
+  });
+  walk(h);
+})();
+function typeSub(){
+  const el = document.getElementById("typed"), full = el.textContent;
+  if (reduce || document.hidden) return;
+  el.textContent = ""; let i = 0;
+  const t = setInterval(()=>{ el.textContent = full.slice(0, ++i); if (i>=full.length) clearInterval(t); }, 45);
+  setTimeout(()=>{ clearInterval(t); el.textContent = full; }, 4000);
+}
+(function sky(){
+  const cv = document.getElementById("sky"), hero = document.getElementById("hero");
+  if (reduce) return;
+  const g = cv.getContext("2d"); let W=0,H=0, dpr=1; const P = [];
+  function size(){ dpr = Math.min(devicePixelRatio||1,2); W = cv.clientWidth; H = cv.clientHeight; cv.width=W*dpr; cv.height=H*dpr; g.setTransform(dpr,0,0,dpr,0,0); }
+  size(); addEventListener("resize", size);
+  for (let i=0;i<26;i++) P.push({x:Math.random(),y:Math.random(),s:4+Math.random()*7,v:.02+Math.random()*.05,r:Math.random()*6,life:Infinity,c:Math.random()<.5?0:1,a:.12+Math.random()*.18});
+  hero.addEventListener("pointermove", e=>{
+    const b = cv.getBoundingClientRect();
+    if (Math.random()<.5) P.push({x:(e.clientX-b.left)/W,y:(e.clientY-b.top)/H,s:5+Math.random()*6,v:-.06-Math.random()*.08,r:Math.random()*6,life:1,c:Math.random()<.6?0:2,a:.9});
+  });
+  let last = performance.now();
+  (function frame(t){
+    const dt = Math.min(50, t-last)/1000; last = t;
+    const [A,B] = tokens(); const cols = [A,B,"#ffd500"];
+    g.clearRect(0,0,W,H);
+    for (let i=P.length-1;i>=0;i--){ const p = P[i];
+      p.y -= p.v*dt; p.r += dt*.6;
+      if (p.life!==Infinity){ p.life -= dt*.9; if (p.life<=0){ P.splice(i,1); continue; } }
+      if (p.y < -.05) p.y = 1.05;
+      const x = p.x*W, y = p.y*H, s = p.s;
+      g.save(); g.translate(x,y); g.rotate(p.r); g.globalAlpha = p.life===Infinity ? p.a : p.a*p.life;
+      g.strokeStyle = cols[p.c]; g.lineWidth = 2; g.lineCap="round";
+      g.beginPath(); g.moveTo(-s,-s); g.lineTo(s,s); g.moveTo(s,-s); g.lineTo(-s,s); g.stroke(); g.restore();
+    }
+    if (P.length>140) P.splice(26, P.length-140);
+    requestAnimationFrame(frame);
+  })(last);
+})();
+function countUp(){
+  document.querySelectorAll("[data-count]").forEach(el=>{
+    const n = +el.dataset.count; if (reduce) return;
+    let i = 0; el.textContent = "0";
+    const t = setInterval(()=>{ el.textContent = ++i; if (i>=n) clearInterval(t); }, 220);
+    setTimeout(()=>{ clearInterval(t); el.textContent = n; }, 2000);
+  });
+}
+
+/* ---------- ticker ---------- */
+(function ticker(){
+  const a = ["вишиванка","<i>✕</i>","смартфон","<i>✕</i>","калина","<i>✕</i>","мем","<i>✕</i>","соловейко","<i>✕</i>","подкаст","<i>✕</i>","ґанок","<i>✕</i>","штучний інтелект","<i>✕</i>","пісня","<i>✕</i>","гіперпосилання","<i>✕</i>"];
+  const b = ["підмет","·","присудок","·","займенник","·","кальки","·","суржик","·","граматична основа","·","морфологія","·","рідне слово","·"];
+  const fill = (id, arr)=>{ const html = arr.map(x=>`<span>${x}</span>`).join(""); document.getElementById(id).innerHTML = html + html + html + html; };
+  fill("row1", a); fill("row2", b);
+})();
+
+/* ---------- cards ---------- */
+const grid = document.getElementById("grid");
+WORKS.forEach((w,i)=>{
+  const el = document.createElement("article");
+  el.className = "card"; el.style.setProperty("--i", i);
+  let cover;
+  if (w.type==="slides") cover = `<div class="stage">${(window.GRAMMAR_SLIDES||[])[0]?.html||""}</div>`;
+  else if (w.type==="video") cover = `<video src="${w.open.src}#t=6" muted playsinline preload="metadata" loop></video><span class="playbig" aria-hidden="true">▶</span>`;
+  else cover = `<canvas data-seed="${i+3}"></canvas>`;
+  const action = w.open
+    ? `<button class="btn primary" type="button" data-open="${i}">${esc(w.label)} <span class="arr">→</span></button>`
+    : `<a class="btn primary" href="${esc(w.href)}" target="_blank" rel="noopener">${esc(w.label)} <span class="arr">↗</span></a><span class="ext-note">відкриється на сайті Canva, вхід не потрібен</span>`;
+  el.innerHTML = `
+    <div class="cover" ${w.open?`data-open="${i}"`:`data-href="1"`}>${cover}
+      <div class="ico">${ICONS[w.type]}</div>
+      <span class="num">${String(i+1).padStart(2,"0")} / ${String(WORKS.length).padStart(2,"0")}</span>
+      <span class="hint">${w.open?"Відкрити тут":"Відкрити в Canva ↗"}</span></div>
+    <div class="body">
+      <div class="chips">${w.chips.map((c,j)=>`<span class="chip ${j?"":"t"}">${esc(c)}</span>`).join("")}</div>
+      <h3>${esc(w.title)}</h3>
+      <p>${esc(w.desc)}</p>
+      <div class="author"><div class="ava">${esc(initials(w.name))}</div><div><div class="n">${esc(w.name)}</div><div class="c">${esc(w.cls)}</div></div></div>
+      <div class="actions">${action}</div>
+    </div>`;
+  grid.appendChild(el);
+  if (w.type==="video"){
+    const v = el.querySelector("video");
+    el.addEventListener("mouseenter", ()=>{ v.play().catch(()=>{}); });
+    el.addEventListener("mouseleave", ()=>{ v.pause(); });
+  }
+  // 3D tilt + glare following the pointer
+  if (!reduce) {
+    el.addEventListener("pointermove", e=>{
+      if (e.pointerType!=="mouse") return;
+      const b = el.getBoundingClientRect(), x = (e.clientX-b.left)/b.width, y = (e.clientY-b.top)/b.height;
+      el.style.setProperty("--ry", ((x-.5)*8).toFixed(2)+"deg");
+      el.style.setProperty("--rx", ((.5-y)*6).toFixed(2)+"deg");
+      el.style.setProperty("--mx", (x*100)+"%"); el.style.setProperty("--my", (y*100)+"%");
+    });
+    el.addEventListener("pointerleave", ()=>{ el.style.setProperty("--rx","0deg"); el.style.setProperty("--ry","0deg"); });
+  }
+});
+grid.addEventListener("click", e=>{
+  const o = e.target.closest("[data-open]");
+  if (o) return openWork(+o.dataset.open, o.closest(".card").querySelector(".cover"));
+  const h = e.target.closest(".cover[data-href]");
+  if (h) { const a = h.closest(".card").querySelector("a.btn"); a && a.click(); }
+});
+// cards lift into place as they scroll into view (content stays visible the whole time)
+if ("IntersectionObserver" in window && !reduce){
+  let ready = false; setTimeout(()=>ready = true, 2600);
+  const io = new IntersectionObserver(es=>es.forEach(en=>{
+    if (!en.isIntersecting || !ready) return;
+    en.target.classList.remove("reveal"); void en.target.offsetWidth; en.target.classList.add("reveal"); io.unobserve(en.target);
+  }), {rootMargin:"0px 0px -10% 0px"});
+  setTimeout(()=>grid.querySelectorAll(".card").forEach(c=>{ const b = c.getBoundingClientRect(); if (b.top > innerHeight) io.observe(c); }), 2600);
+}
+
+/* ripple on every button */
+document.addEventListener("pointerdown", e=>{
+  const b = e.target.closest(".btn"); if (!b || reduce) return;
+  const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height)*2.2, d = document.createElement("span");
+  d.className = "rip"; d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX-r.left-s/2}px;top:${e.clientY-r.top-s/2}px`;
+  b.appendChild(d); setTimeout(()=>d.remove(), 650);
+});
+/* scroll progress */
+addEventListener("scroll", ()=>{
+  const m = document.documentElement.scrollHeight - innerHeight;
+  document.getElementById("progress").style.transform = `scaleX(${m>0 ? scrollY/m : 0})`;
+}, {passive:true});
+
+/* ---------- viewer: flies out of the card, flies back on close ---------- */
+const dlg = document.getElementById("dlg"), dlgb = document.getElementById("dlgb");
+let onKey = null, cleanup = null, origin = null;
+function flyFrom(rect, reverse){
+  if (reduce || !rect || !dlg.animate) return Promise.resolve();
+  const d = dlg.getBoundingClientRect();
+  const sx = rect.width / d.width, sy = rect.height / d.height;
+  const tx = rect.left + rect.width/2 - (d.left + d.width/2), ty = rect.top + rect.height/2 - (d.top + d.height/2);
+  const from = {transform:`translate(${tx}px,${ty}px) scale(${sx},${sy})`, opacity:.4, borderRadius:"16px"};
+  const to = {transform:"none", opacity:1};
+  const a = dlg.animate(reverse ? [to, from] : [from, to], {duration: reverse ? 380 : 560, easing: reverse ? "cubic-bezier(.6,0,.8,.4)" : "cubic-bezier(.2,1,.3,1)", fill:"both"});
+  return a.finished.then(()=>{ if (!reverse) a.cancel(); return a; });
+}
+function openWork(i, coverEl){
+  const w = WORKS[i];
+  document.getElementById("dlgt").textContent = w.title;
+  document.getElementById("dlga").textContent = `${w.name}, ${w.cls}`;
+  dlgb.innerHTML = "";
+  dlg.classList.remove("max", "closing"); setFsLabel();
+  dlg.getAnimations().forEach(a=>a.cancel());
+  if (w.open.kind==="video") dlgb.innerHTML = `<video src="${w.open.src}" controls playsinline autoplay></video>`;
+  else if (w.open.kind==="pdf") showPdf(w.open.src);
+  else showSlides();
+  dlg.showModal();
+  origin = coverEl || null;
+  flyFrom(origin && origin.getBoundingClientRect(), false);
+}
+let closing = false;
+async function closeDlg(){
+  if (!dlg.open || closing) return; closing = true;
+  dlgb.querySelectorAll("video,audio").forEach(m=>m.pause());
+  dlg.classList.add("closing");
+  const r = origin && origin.isConnected ? origin.getBoundingClientRect() : null;
+  if (r && !dlg.classList.contains("max")) { const a = await flyFrom(r, true); dlg.close(); a && a.cancel(); }
+  else dlg.close();
+  closing = false;
+}
+document.getElementById("dlgclose").onclick = closeDlg;
+dlg.addEventListener("cancel", e=>{ e.preventDefault(); closeDlg(); });
+dlg.addEventListener("close", ()=>{ if (dlg.open) return; dlg.classList.remove("closing","max"); dlgb.querySelectorAll("video,audio").forEach(m=>m.pause()); dlgb.innerHTML=""; onKey=null; cleanup&&cleanup(); cleanup=null; });
+dlg.addEventListener("click", e=>{ if (e.target===dlg) closeDlg(); });
+document.addEventListener("keydown", e=>{ if (dlg.open && onKey) onKey(e); });
+// full screen: always works by stretching the viewer to the whole window; real fullscreen is a bonus where allowed
+const fsBtn = document.getElementById("dlgfs");
+function setFsLabel(){ fsBtn.textContent = dlg.classList.contains("max") ? "⤡ Звичайний розмір" : "⛶ На весь екран"; }
+fsBtn.onclick = ()=>{
+  const on = !dlg.classList.contains("max");
+  if (!reduce && dlg.animate){
+    const before = dlg.getBoundingClientRect(); dlg.classList.toggle("max", on); const after = dlg.getBoundingClientRect();
+    dlg.animate([{transform:`translate(${before.left-after.left}px,${before.top-after.top}px) scale(${before.width/after.width},${before.height/after.height})`, transformOrigin:"0 0"},{transform:"none", transformOrigin:"0 0"}], {duration:420, easing:"cubic-bezier(.2,1,.3,1)"});
+  } else dlg.classList.toggle("max", on);
+  setFsLabel();
+  try { if (on && dlg.requestFullscreen) dlg.requestFullscreen().catch(()=>{}); else if (!on && document.fullscreenElement) document.exitFullscreen().catch(()=>{}); } catch(_){}
+};
+document.addEventListener("fullscreenchange", ()=>{ if (!document.fullscreenElement && dlg.classList.contains("max") && dlg.open) { dlg.classList.remove("max"); setFsLabel(); } });
+
+/* confetti in Ukrainian colours */
+function confetti(){
+  if (reduce) return;
+  const host = dlgb; let cv = host.querySelector("#confetti");
+  if (!cv){ cv = document.createElement("canvas"); cv.id = "confetti"; host.appendChild(cv); }
+  const b = host.getBoundingClientRect(), dpr = Math.min(devicePixelRatio||1,2);
+  cv.style.top = host.scrollTop + "px"; cv.style.height = b.height+"px";
+  cv.width = b.width*dpr; cv.height = b.height*dpr; const g = cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0);
+  const cols = ["#0057b7","#ffd500","#ff5a55","#ffffff"], P = [];
+  for (let i=0;i<160;i++) P.push({x:b.width/2+(Math.random()-.5)*120, y:b.height*.55, vx:(Math.random()-.5)*13, vy:-7-Math.random()*11, r:Math.random()*6, vr:(Math.random()-.5)*.4, s:5+Math.random()*7, c:cols[i%4], cross:Math.random()<.35});
+  const t0 = performance.now();
+  (function f(t){
+    g.clearRect(0,0,b.width,b.height);
+    P.forEach(p=>{ p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillStyle = g.strokeStyle = p.c;
+      if (p.cross){ g.lineWidth = 2.5; g.beginPath(); g.moveTo(-p.s/2,-p.s/2); g.lineTo(p.s/2,p.s/2); g.moveTo(p.s/2,-p.s/2); g.lineTo(-p.s/2,p.s/2); g.stroke(); }
+      else g.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+      g.restore(); });
+    if (t-t0 < 2600 && cv.isConnected) requestAnimationFrame(f); else cv.remove();
+  })(t0);
+}
+
+/* PDF via pdf.js (pages rendered as images, works everywhere) */
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+let pdfLib = null;
+function getPdfLib(){
+  if (!pdfLib) pdfLib = loadScript(PDFJS+"pdf.worker.min.js").then(()=>loadScript(PDFJS+"pdf.min.js")).then(()=>{
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS+"pdf.worker.min.js"; return window.pdfjsLib; });
+  return pdfLib;
+}
+const pdfCache = {};
+function getPdf(src){
+  if (!pdfCache[src]) pdfCache[src] = Promise.all([getPdfLib(), fetch(src).then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); })])
+    .then(([lib,buf])=>lib.getDocument({data:new Uint8Array(buf), isEvalSupported:false}).promise)
+    .then(pdf=>{ pdf.__fixLabel = /otrishko/.test(src); return pdf; });
+  return pdfCache[src];
+}
+async function renderPage(pdf, n, canvas, width){
+  const page = await pdf.getPage(n);
+  const base = page.getViewport({scale:1});
+  const vp = page.getViewport({scale: width / base.width});
+  canvas.width = Math.round(vp.width); canvas.height = Math.round(vp.height);
+  await page.render({canvasContext:canvas.getContext("2d"), viewport:vp}).promise;
+  if (n===1 && pdf.__fixLabel) await fixPdfLabel(canvas, vp.scale);
+}
+// Roman's cover page says "Тиждень інформатики"; the event is the Week of the Ukrainian language.
+// Repaint that line in place: same position, size, letter-spacing and colour; the separator and
+// "ОСВІТНІЙ ІНТЕНСИВ" are moved right by however much longer the new wording is.
+async function fixPdfLabel(canvas, s){
+  try { await document.fonts.load('500 12px "Golos Text"'); } catch(_){}
+  const g = canvas.getContext("2d");
+  const OLD = "ТИЖДЕНЬ ІНФОРМАТИКИ", NEW = "ТИЖДЕНЬ УКРАЇНСЬКОЇ МОВИ";
+  const x0 = 60.2, baseline = 81.7, oldW = 167.2;            // from the PDF's own text layer (points)
+  g.font = `500 ${12*s}px "Golos Text","Segoe UI",sans-serif`;
+  const nat = t => [...t].reduce((a,ch)=>a + g.measureText(ch).width, 0);
+  const ls = (oldW*s - nat(OLD)) / (OLD.length - 1);
+  const delta = nat(NEW) + ls*(NEW.length - 1) - oldW*s;
+  const sx = Math.round(229*s), sy = Math.round(64*s), sw = Math.round(176*s), sh = Math.round(28*s);
+  const tail = g.getImageData(sx, sy, sw, sh);
+  const ex = Math.round(56*s), ew = Math.round(349*s + Math.max(0, delta));
+  for (let y = sy; y < sy + sh; y++){
+    const p = g.getImageData(Math.round(50*s), y, 1, 1).data;
+    g.fillStyle = `rgb(${p[0]},${p[1]},${p[2]})`; g.fillRect(ex, y, ew, 1);
+  }
+  g.putImageData(tail, Math.round(sx + delta), sy);
+  g.fillStyle = "#fff"; g.textBaseline = "alphabetic";
+  let x = x0*s; for (const ch of NEW){ g.fillText(ch, x, baseline*s); x += g.measureText(ch).width + ls; }
+}
+async function showPdf(src){
+  dlgb.innerHTML = `<div class="loading"><div class="spin"></div>Завантажую презентацію…</div>`;
+  try{
+    const pdf = await getPdf(src);
+    const box = document.createElement("div"); box.className="pdfpages";
+    dlgb.innerHTML = ""; dlgb.appendChild(box);
+    const width = Math.min(1400, Math.max(600, dlgb.clientWidth - 32)) * Math.min(devicePixelRatio||1, 2);
+    for (let n=1; n<=pdf.numPages; n++){
+      const c = document.createElement("canvas"); c.setAttribute("aria-label", `Сторінка ${n}`);
+      await renderPage(pdf, n, c, width);
+      if (!dlg.open || !box.isConnected) return;
+      c.style.animationDelay = (n<=2 ? (n-1)*120 : 0) + "ms";
+      box.appendChild(c);
+    }
+  }catch(err){
+    dlgb.innerHTML = `<div class="loading">Не вдалося показати PDF. Оновіть сторінку й спробуйте ще раз.</div>`;
+  }
+}
+(async ()=>{
+  const i = WORKS.findIndex(w=>w.type==="pdf"); if (i<0) return;
+  try{
+    const pdf = await getPdf(WORKS[i].open.src);
+    const cv = grid.children[i].querySelector(".cover > canvas");
+    cv.removeAttribute("data-seed");
+    await renderPage(pdf, 1, cv, 900);
+    cv.style.background = "#fff";
+    if (!reduce) cv.animate([{opacity:0, filter:"blur(8px)"},{opacity:1, filter:"none"}], {duration:700});
+  }catch(_){}
+})();
+
+/* Interactive slides (converted from PowerPoint) */
+const SL = window.GRAMMAR_SLIDES || [];
+function showSlides(){
+  let cur = 0;
+  dlgb.innerHTML = `<div class="player">
+    <div class="stage" id="stage"></div>
+    <div class="sbar"><i id="sbar"></i></div>
+    <div class="ctrl"><button class="btn" id="sp" type="button"><span class="arr">←</span> Назад</button><span id="sn"></span><button class="btn" id="sx" type="button">Далі <span class="arr">→</span></button></div></div>`;
+  const stage = dlgb.querySelector("#stage"), sn = dlgb.querySelector("#sn"), sbar = dlgb.querySelector("#sbar");
+  function go(n, withFx){
+    const next = Math.max(0, Math.min(SL.length-1, n));
+    if (next===cur && stage.children.length) return;
+    const dir = next >= cur ? "next" : "prev"; cur = next;
+    const old = stage.querySelector(".sl:not(.out):not(.out-prev)");
+    const s = document.createElement("div"); s.className = "sl" + (withFx && !reduce ? " in-"+dir : ""); s.innerHTML = SL[cur].html;
+    if (old){ if (withFx && !reduce){ old.classList.add(dir==="next"?"out":"out-prev"); setTimeout(()=>old.remove(), 460); } else old.remove(); }
+    stage.appendChild(s);
+    sn.textContent = `${cur+1} / ${SL.length}`;
+    sbar.style.width = ((cur+1)/SL.length*100)+"%";
+    if (withFx && SL[cur].sound) { const a = new Audio("works/grammar/"+SL[cur].sound); a.volume=.6; a.play().catch(()=>{}); }
+    if (withFx && /Правильно!|Молодець/.test(SL[cur].html)) setTimeout(confetti, 250);
+  }
+  stage.addEventListener("click", e=>{
+    const v = e.target.closest(".vid");
+    if (v && !v.querySelector("video")) { v.innerHTML = `<video src="works/grammar/lesson-video.mp4" controls autoplay playsinline></video>`; return; }
+    const g = e.target.closest("[data-go]"); if (!g) return;
+    const t = g.dataset.go;
+    go(t==="next"?cur+1 : t==="prev"?cur-1 : t==="first"?0 : (+t)-1, true);
+  });
+  stage.addEventListener("keydown", e=>{ if ((e.key==="Enter"||e.key===" ") && e.target.matches("[data-go]")) { e.preventDefault(); e.target.click(); } });
+  dlgb.querySelector("#sp").onclick = ()=>go(cur-1, true);
+  dlgb.querySelector("#sx").onclick = ()=>go(cur+1, true);
+  onKey = e=>{ if (e.target.closest && e.target.closest("video")) return;
+    if (e.key==="ArrowRight"||e.key==="PageDown") { e.preventDefault(); go(cur+1,true); }
+    if (e.key==="ArrowLeft"||e.key==="PageUp") { e.preventDefault(); go(cur-1,true); } };
+  cur = -1; go(0, false);
+}
+
+/* ---------- sharing ---------- */
+const shareText = "Віртуальний стенд «Цифровий світ, українське слово — презентуємо мову по-новому» · Білогородський Академічний Ліцей №2";
+document.getElementById("tg").href = "https://t.me/share/url?url="+encodeURIComponent(STAND_URL)+"&text="+encodeURIComponent(shareText);
+const toast = document.getElementById("toast");
+document.getElementById("copy").addEventListener("click", ()=>{
+  const done = ()=> toast.textContent = "Посилання скопійовано ✓";
+  try{ navigator.clipboard.writeText(STAND_URL).then(done, ()=> toast.textContent = STAND_URL); }
+  catch(_){ toast.textContent = STAND_URL; }
+});
+
+/* ---------- start ---------- */
+drawBands(false);
+let rt; addEventListener("resize", ()=>{ clearTimeout(rt); rt = setTimeout(()=>drawBands(false), 120); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", ()=>drawBands(false));
+new MutationObserver(()=>drawBands(false)).observe(root,{attributes:true,attributeFilter:["data-theme"]});
+splash().then(()=>{
+  if (document.hidden || reduce) return;
+  requestAnimationFrame(()=>{ root.classList.add("go"); drawBands(true); typeSub(); countUp(); });
+});
+</script>
