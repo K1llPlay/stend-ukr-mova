@@ -1,3 +1,12 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Віртуальний стенд учнівських робіт з української мови · Білогородський Академічний Ліцей №2">
+<meta property="og:title" content="Цифровий світ, українське слово — презентуємо мову по-новому">
+<meta property="og:description" content="Виставка учнівських робіт · Білогородський Академічний Ліцей №2">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Цифровий світ, українське слово</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -566,22 +575,39 @@ async function closeDlg(){
 }
 document.getElementById("dlgclose").onclick = closeDlg;
 dlg.addEventListener("cancel", e=>{ e.preventDefault(); closeDlg(); });
-dlg.addEventListener("close", ()=>{ if (dlg.open) return; dlg.classList.remove("closing","max"); dlgb.querySelectorAll("video,audio").forEach(m=>m.pause()); dlgb.innerHTML=""; onKey=null; cleanup&&cleanup(); cleanup=null; });
+dlg.addEventListener("close", ()=>{ if (dlg.open) return; exitFs(); dlg.classList.remove("closing","max"); dlgb.querySelectorAll("video,audio").forEach(m=>m.pause()); dlgb.innerHTML=""; onKey=null; cleanup&&cleanup(); cleanup=null; });
 dlg.addEventListener("click", e=>{ if (e.target===dlg) closeDlg(); });
 document.addEventListener("keydown", e=>{ if (dlg.open && onKey) onKey(e); });
-// full screen: always works by stretching the viewer to the whole window; real fullscreen is a bonus where allowed
+// full screen: the whole browser goes fullscreen (the page itself, so the open viewer stays on top
+// and fills the monitor); where a browser refuses, the viewer still stretches over the window
 const fsBtn = document.getElementById("dlgfs");
-function setFsLabel(){ fsBtn.textContent = dlg.classList.contains("max") ? "⤡ Звичайний розмір" : "⛶ На весь екран"; }
-fsBtn.onclick = ()=>{
-  const on = !dlg.classList.contains("max");
-  if (!reduce && dlg.animate){
+const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+function enterFs(){
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (!req) return;
+  try { const p = req.call(el, {navigationUI:"hide"}); if (p && p.catch) p.catch(()=>{}); } catch(_){}
+}
+function exitFs(){
+  if (!fsEl()) return;
+  const ex = document.exitFullscreen || document.webkitExitFullscreen;
+  try { const p = ex.call(document); if (p && p.catch) p.catch(()=>{}); } catch(_){}
+}
+function setFsLabel(){ fsBtn.textContent = dlg.classList.contains("max") ? "⤡ Вийти з повного екрана" : "⛶ На весь екран"; }
+function setMax(on){
+  if (!reduce && dlg.animate && dlg.open){
     const before = dlg.getBoundingClientRect(); dlg.classList.toggle("max", on); const after = dlg.getBoundingClientRect();
     dlg.animate([{transform:`translate(${before.left-after.left}px,${before.top-after.top}px) scale(${before.width/after.width},${before.height/after.height})`, transformOrigin:"0 0"},{transform:"none", transformOrigin:"0 0"}], {duration:420, easing:"cubic-bezier(.2,1,.3,1)"});
   } else dlg.classList.toggle("max", on);
   setFsLabel();
-  try { if (on && dlg.requestFullscreen) dlg.requestFullscreen().catch(()=>{}); else if (!on && document.fullscreenElement) document.exitFullscreen().catch(()=>{}); } catch(_){}
+}
+fsBtn.onclick = ()=>{
+  const on = !dlg.classList.contains("max");
+  if (on) enterFs(); else exitFs();   // must run inside the click itself
+  setMax(on);
 };
-document.addEventListener("fullscreenchange", ()=>{ if (!document.fullscreenElement && dlg.classList.contains("max") && dlg.open) { dlg.classList.remove("max"); setFsLabel(); } });
+function onFsChange(){ if (!fsEl() && dlg.open && dlg.classList.contains("max")) setMax(false); }
+document.addEventListener("fullscreenchange", onFsChange);
+document.addEventListener("webkitfullscreenchange", onFsChange);
 
 /* confetti in Ukrainian colours */
 function confetti(){
